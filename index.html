@@ -299,11 +299,15 @@
             });
         }
 
+        let debounceTimer;
         document.getElementById('search').addEventListener('input', function() {
             const query = this.value;
-            if (query.length > 2) {
-                generatePlaylists(query);
-            }
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                if (query.length > 2) {
+                    generatePlaylists(query);
+                }
+            }, 300);
         });
 
         if (!accessToken) {
