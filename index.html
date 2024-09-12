@@ -35,11 +35,6 @@
             animation: bounceIn 1s ease-in-out;
         }
 
-        @keyframes bounceIn {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
         h2 {
             font-size: 2.5em;
             color: #333;
@@ -335,14 +330,28 @@
                 if (query.length > 2) {
                     generatePlaylists(query);
                 }
-            }, 500);  // Increased debounce time
+            }, 300);  // Reduce debounce to ensure quick responsiveness
+        }
+
+        function ensureFocusOnMobile() {
+            searchInput.addEventListener('touchstart', () => {
+                searchInput.focus();  // Ensure input is focused on touch
+            });
+        }
+
+        function continuousRecheck() {
+            setInterval(() => {
+                const query = searchInput.value.trim();
+                if (query.length > 2) {
+                    generatePlaylists(query);  // Recheck periodically
+                }
+            }, 1000);  // Polling interval of 1 second
         }
 
         searchInput.addEventListener('input', handleInput);
         searchInput.addEventListener('change', handleInput);
-        searchInput.addEventListener('touchstart', () => {
-            searchInput.focus();  // Focus on input for mobile devices
-        });
+        ensureFocusOnMobile();
+        continuousRecheck();
 
         // Handle the redirect from Spotify authorization
         if (window.location.hash) {
