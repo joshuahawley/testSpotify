@@ -331,16 +331,18 @@
         function handleInput() {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => {
-                const query = searchInput.value;
+                const query = searchInput.value.trim();
                 if (query.length > 2) {
                     generatePlaylists(query);
                 }
-            }, 300);
+            }, 500);  // Increased debounce time
         }
 
         searchInput.addEventListener('input', handleInput);
-        searchInput.addEventListener('keyup', handleInput);
-        searchInput.addEventListener('paste', handleInput);
+        searchInput.addEventListener('change', handleInput);
+        searchInput.addEventListener('touchstart', () => {
+            searchInput.focus();  // Focus on input for mobile devices
+        });
 
         // Handle the redirect from Spotify authorization
         if (window.location.hash) {
