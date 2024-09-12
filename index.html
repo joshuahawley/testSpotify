@@ -147,6 +147,33 @@
             height: 24px;
             margin-right: 10px;
         }
+
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 20px;
+            }
+            h2 {
+                font-size: 2em;
+            }
+            input[type="text"] {
+                font-size: 1em;
+                padding: 10px;
+            }
+            .playlist {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            .playlists {
+                flex-direction: column;
+                align-items: center;
+            }
+            .save-button {
+                font-size: 1em;
+                padding: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -165,7 +192,7 @@
             </div>
         </div>
     </div>
-
+    
     <script>
         const clientId = 'bb0c4f2e18d2498b845abf3f8ce1a92b';  // Replace with your Spotify Client ID
         const redirectUri = 'https://joshuahawley.github.io/testSpotify/callback';  // Replace with the correct redirect URI
