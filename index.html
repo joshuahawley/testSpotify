@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .playlists {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .playlist {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            width: 30%;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .playlist h3 {
+            text-align: center;
+            margin-top: 0;
+        }
+        .track {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .track img {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .track-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .track-info span {
+            font-size: 14px;
+        }
+        .save-button {
+            background-color: #1ED760;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .save-button img {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Music Search</h2>
+        <input type="text" id="search" placeholder="Type a band, album, or song...">
+        <div class="playlists">
+            <div class="playlist" id="playlist1">
+                <h3>Playlist 1</h3>
+            </div>
+            <div class="playlist" id="playlist2">
+                <h3>Playlist 2</h3>
+            </div>
+            <div class="playlist" id="playlist3">
+                <h3>Playlist 3</h3>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const clientId = 'bb0c4f2e18d2498b845abf3f8ce1a92b';  // Replace with your Spotify Client ID
+        const redirectUri = 'https://joshuahawley.github.io/testSpotify/callback';  // Replace with the correct redirect URI
+        let accessToken = localStorage.getItem('spotify_access_token');
+
+        function authorize() {
+            const scopes = 'playlist-modify-public playlist-modify-private';
+            const url = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
+            window.location.href = url;
+        }
+
+        async function searchMusic(query) {
+            const result = await fetch(`https://api.spotify.com/v1/search?q=${query}&type=track,artist,album`, {
+                method: 'GET',
+                headers: { 'Authorization': 'Bearer ' + accessToken }
+            });
+            const data = await result.json();
+            return data;
+        }
+
+        async function generatePlaylists(query) {
+            const data = await searchMusic(query);
+            const tracks = data.tracks.items;
+            const playlists = [[], [], []];
+
+            tracks.forEach((track, index) => {
+                playlists[index % 3].push(track);
+            });
+
+            playlists.forEach((playlist, index) => {
+                const playlistElement = document.getElementById(`playlist${index + 1}`);
+                playlistElement.innerHTML = `<h3>Playlist ${index + 1}</h3>`;
+                playlist.forEach(track => {
+                    const trackElement = document.createElement('div');
+                    trackElement.className = 'track';
+                    trackElement.innerHTML = `
+                        <img src="${track.album.images[0].url}" alt="${track.uri}">
+                        <div class="track-info">
+                            <span>${track.name}</span>
+                            <span>${track.artists[0].name}</span>
+                        </div>
+                    `;
+                    playlistElement.appendChild(trackElement);
+                });
+            });
+        }
+
+        document.getElementById('search').addEventListener('input', function() {
+            const query = this.value;
+            if (query.length > 2) {
+                generatePlaylists(query);
+            }
+        });
+
+        if (!accessToken) {
+            authorize();
+        }
+    </script>
+</body>
+</html>

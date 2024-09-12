@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Callback</title>
+    <script>
+        async function getAccessToken(code) {
+            const clientId = 'bb0c4f2e18d2498b845abf3f8ce1a92b';  // Replace with your actual Client ID
+            const clientSecret = 'b7164f4d7de5421294d9682409ad0e32';  // Replace with your actual Client Secret
+            const redirectUri = 'https://joshuahawley.github.io/testSpotify/callback';  // Make sure this matches exactly in your Spotify dashboard
+
+            const result = await fetch('https://accounts.spotify.com/api/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret)
+                },
+                body: `grant_type=authorization_code&code=${code}&redirect_uri=${encodeURIComponent(redirectUri)}`
+            });
+            const data = await result.json();
+            if (data.access_token) {
+                return data.access_token;
+            } else {
+                console.error('Error fetching access token:', data);
+            }
+        }
+
+        async function handleCallback() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            if (code) {
+                const accessToken = await getAccessToken(code);
+                if (accessToken) {
+                    localStorage.setItem('spotify_access_token', accessToken);
+                    window.location.href = 'index.html';  // Redirect to your main app page
+                } else {
+                    console.error('Failed to obtain access token.');
+                }
+            } else {
+                console.error('Authorization code not found in the URL.');
+            }
+        }
+
+        window.onload = handleCallback;
+    </script>
+</head>
+<body>
+    <h1>Processing...</h1>
+</body>
+</html>
